@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # X Auto Poster — Tech/AI Niche
 
 > AI-powered tweet generator with push notifications. Runs locally on your phone.
@@ -99,3 +100,6 @@ x-autoposter/
 ├── manifest.json ← PWA config (install as app)
 └── README.md     ← this file
 ```
+=======
+# Xposter
+>>>>>>> c2ec32237e6f1777741e1562f845b4b7e3e0fed4
