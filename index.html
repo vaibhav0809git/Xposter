@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="apple-mobile-web-app-title" content="XPoster" />
+    <meta name="theme-color" content="#000000" />
+    <title>X Auto Poster</title>
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <div class="app">
+      <!-- Top bar -->
+      <div class="topbar">
+        <div class="topbar-left">
+          <div>
+            <div class="topbar-logo">𝕏 AutoPoster</div>
+            <div class="topbar-sub">Tech · Coding · AI/ML</div>
+          </div>
+        </div>
+        <div class="topbar-badge" id="topbar-mode-badge">Review mode</div>
+      </div>
+
+      <!-- ── Panel: Home / Generate ── -->
+      <div class="panel active" id="panel-home">
+        <!-- Stats -->
+        <div style="height: 12px"></div>
+        
+        <!-- Post Reminder Meter -->
+        <div class="meter-card" id="post-meter-container" style="display: none;">
+          <div class="meter-header">
+            <span class="meter-title">Next Post Reminder</span>
+            <span class="meter-timer" id="meter-timer">00:00:00</span>
+          </div>
+          <div class="meter-track">
+            <div class="meter-fill" id="meter-fill"></div>
+          </div>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat">
+            <div class="stat-n" id="stat-gen">0</div>
+            <div class="stat-l">Generated</div>
+          </div>
+          <div class="stat">
+            <div class="stat-n" id="stat-sched">0</div>
+            <div class="stat-l">Posted</div>
+          </div>
+        </div>
+
+        <!-- Mode -->
+        <div class="card">
+          <div class="card-title">Posting mode</div>
+          <div class="mode-row">
+            <div
+              class="mode-opt active"
+              id="mode-notify"
+              onclick="
+                setMode('notify');
+                updateModeBadge();
+              "
+            >
+              <div class="radio"></div>
+              <div>
+                <div class="mode-label">Review first</div>
+                <div class="mode-sub">You approve each post</div>
+              </div>
+            </div>
+            <div
+              class="mode-opt"
+              id="mode-auto"
+              onclick="
+                setMode('auto');
+                updateModeBadge();
+              "
+            >
+              <div class="radio"></div>
+              <div>
+                <div class="mode-label">Auto-schedule</div>
+                <div class="mode-sub">Notified + opens X</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Topics active today -->
+        <div class="card">
+          <div class="card-title">Topics today</div>
+          <div class="rule-tags" id="topic-tags"></div>
+          <div class="add-topic-row">
+            <input type="text" id="custom-topic-input" placeholder="Add custom niche..." onkeydown="if(event.key==='Enter') addCustomTopic()">
+            <button onclick="addCustomTopic()">+</button>
+          </div>
+        </div>
+
+
+
+        <!-- Generate button -->
+        <button class="gen-btn" id="gen-btn" onclick="generatePosts()">
+          <span>⚡</span>
+          <span id="gen-btn-text">Generate today's posts</span>
+        </button>
+
+        <div class="section-gap"></div>
+
+        <!-- Posts list -->
+        <div id="posts-section" style="display: none">
+          <div class="card-title" style="padding: 0 2px; margin-bottom: 8px">
+            Today's posts
+          </div>
+          <div id="posts-list"></div>
+        </div>
+      </div>
+
+
+      <!-- ── Panel: Labs ── -->
+      <div class="panel" id="panel-labs">
+        <div class="labs-header">
+          <h1>🧪 Experimental Labs</h1>
+          <p>Advanced AI features and deep analytics</p>
+        </div>
+
+
+        <!-- Section 3: Image Gen -->
+        <div class="labs-section" id="ls-images">
+          <div class="ls-header" onclick="toggleLabsSection('images')">
+            <div class="ls-title">🎨 Image Generation <span class="ls-status">DALL-E 3</span></div>
+            <span class="ls-arrow" id="lsa-images">▶</span>
+          </div>
+          <div class="ls-content" id="lsc-images" style="display:none;">
+             <div class="card" style="border:none; background:var(--gray-50); padding:10px; font-size:12px;">
+               Estimated cost per image: $0.04 (DALL-E 3 Standard)
+             </div>
+             <div id="image-history" class="image-history-grid"></div>
+             <div style="margin-top:12px; font-size:11px; color:var(--gray-500)">Manage keys in Settings -> Image Configuration</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── Panel: Settings ── -->
+      <div class="panel" id="panel-settings">
+        <div style="height: 12px"></div>
+
+        <!-- API Configuration -->
+        <div class="card">
+          <div class="card-title">API Configuration</div>
+          <div id="api-key-container"></div>
+          <div id="api-status" style="margin-top: 8px; font-size: 12px; color: var(--gray-600)"></div>
+          
+          <div style="margin-top: 16px; border-top: 1px solid var(--gray-100); pt: 12px;">
+            <label style="display:block; font-size:12px; color:var(--gray-600); margin: 12px 0 6px 0;">Primary Groq Model</label>
+            <select id="global-model" class="settings-select" onchange="updateGlobalModel(this.value)">
+              <option value="llama-3.3-70b-versatile">Llama 3.3 70B (Versatile)</option>
+              <option value="llama-3.1-8b-instant">Llama 3.1 8B (Fast)</option>
+              <option value="llama3-70b-8192">Llama 3 70B</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Custom Command -->
+        <div class="card">
+          <div class="card-title">Custom Generation Command</div>
+          <label
+            style="
+              display: block;
+              font-size: 12px;
+              color: var(--gray-600);
+              margin-bottom: 6px;
+            "
+            >Prompt for AI</label
+          >
+          <textarea
+            id="custom-command-input"
+            placeholder="Generate {{count}} viral tech tweets for today. Topics: {{topics}}. Times: {{times}}..."
+            style="
+              width: 100%;
+              padding: 10px;
+              border: 1px solid var(--gray-200);
+              border-radius: 6px;
+              font-family: monospace;
+              font-size: 12px;
+              min-height: 80px;
+              resize: vertical;
+            "
+          ></textarea>
+          <div style="font-size: 11px; color: var(--gray-500); margin-top: 6px">
+            Variables: {{count}}, {{topics}}, {{times}}
+          </div>
+        </div>
+
+        <!-- Custom Rules -->
+        <div class="card">
+          <div class="card-title">System Rules & Style Guide</div>
+          <label
+            style="
+              display: block;
+              font-size: 12px;
+              color: var(--gray-600);
+              margin-bottom: 6px;
+            "
+            >Rules for generating posts</label
+          >
+          <textarea
+            id="custom-rules-input"
+            placeholder="const DEFAULT_RULES = `You are a viral Tech Twitter personality. Your audience: developers, CS students, ML engineers.
+
+CONTENT TYPES:
+1. HOOK: Standalone punchy tweet (max 280 chars).
+2. THREAD: Numbered (1/n) multipart series. First part is the hook, last is CTA. 3-5 parts. Return as "parts" array.
+3. POLL: Question + 2-4 options (max 25 chars each). Return as "question" and "options" array.
+4. LISTICLE: Numbered list style within one tweet. Use line breaks.
+5. QUOTE: Single bold opinion/hot take ending with a question. Bold style.
+
+STYLE RULES:
+- Topics: DSA, LeetCode, System Design, AI/ML, Python, Java, Database, Backend, Open Source
+- SARCASM style: dry wit, developer humor, relatable pain points
+- Use 1-2 emojis max
+- No hashtags unless they add value
+- Sound human, not corporate.
+
+JSON FORMAT:
+Return an array of objects. Each object must have "type" (hook, thread, poll, listicle, quote), "post" (the main text or first part), and specialized fields like "parts" or "options" where applicable.`;"
+            style="
+              width: 100%;
+              padding: 10px;
+              border: 1px solid var(--gray-200);
+              border-radius: 6px;
+              font-family: monospace;
+              font-size: 12px;
+              min-height: 150px;
+              resize: vertical;
+            "
+          ></textarea>
+        </div>
+
+        <!-- Image Generation -->
+        <div class="card">
+          <div class="card-title">Image Generation</div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <span style="font-size:14px; font-weight:500;">Enable Image Features</span>
+            <input type="checkbox" id="img-enabled" onchange="updateImageSetting('enabled', this.checked)" style="width:20px; height:20px; cursor:pointer;">
+          </div>
+          
+          <div style="margin-bottom:16px;">
+            <label style="display:block; font-size:12px; color:var(--gray-600); margin-bottom:6px;">Provider</label>
+            <select id="img-provider" class="settings-select" onchange="updateImageSetting('provider', this.value)">
+              <option value="dalle3">DALL-E 3 (OpenAI)</option>
+              <option value="stability">Stable Diffusion (Stability)</option>
+            </select>
+          </div>
+
+          <div id="openai-key-zone" style="margin-bottom:16px;">
+            <label style="display:block; font-size:12px; color:var(--gray-600); margin-bottom:6px;">OpenAI API Key</label>
+            <input type="password" id="img-openai-key" oninput="updateImageSetting('openaiKey', this.value)" placeholder="sk-..." style="width:100%; padding:10px; border:1px solid var(--gray-200); border-radius:6px; font-size:13px;">
+          </div>
+
+          <div id="stability-key-zone" style="margin-bottom:16px; display:none;">
+            <label style="display:block; font-size:12px; color:var(--gray-600); margin-bottom:6px;">Stability API Key</label>
+            <input type="password" id="img-stability-key" oninput="updateImageSetting('stabilityKey', this.value)" placeholder="sk-..." style="width:100%; padding:10px; border:1px solid var(--gray-200); border-radius:6px; font-size:13px;">
+          </div>
+        </div>
+
+
+        <!-- Post Type Mix -->
+        <div class="card">
+          <div class="card-title">POST TYPE MIX (%)</div>
+          <div style="font-size: 11px; color: var(--gray-500); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px;">TOTAL MUST BE 100%.</div>
+          <div id="type-mix-container">
+            <!-- Dynamicly built -->
+          </div>
+          <div id="type-mix-total" style="text-align: right; font-weight: 700; font-size: 14px; margin-top: 12px; color: #0cce6b;">Total: 100%</div>
+        </div>
+
+        <!-- Extension Settings -->
+        <div class="card">
+          <div class="card-title">🤖 XPoster AI Copilot (Extension)</div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <span style="font-size:14px; font-weight:500;">Enable Copilot</span>
+            <input type="checkbox" id="ext-enabled" onchange="updateExtensionSetting('enabled', this.checked)" style="width:20px; height:20px; cursor:pointer;">
+          </div>
+          
+          <div style="margin-bottom:16px;">
+            <label style="display:block; font-size:12px; color:var(--gray-600); margin-bottom:6px;">Default Reply Style</label>
+            <select id="ext-style" class="settings-select" onchange="updateExtensionSetting('defaultStyle', this.value)">
+              <option value="Professional">Professional</option>
+              <option value="Casual">Casual</option>
+              <option value="Viral">Viral</option>
+            </select>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
+            <div>
+              <label style="display:block; font-size:12px; color:var(--gray-600); margin-bottom:6px;">Temperature</label>
+              <input type="number" id="ext-temp" step="0.1" min="0" max="1" class="settings-input" oninput="updateExtensionSetting('temperature', parseFloat(this.value))">
+            </div>
+            <div>
+              <label style="display:block; font-size:12px; color:var(--gray-600); margin-bottom:6px;">Max Tokens</label>
+              <input type="number" id="ext-tokens" step="50" min="50" max="2000" class="settings-input" oninput="updateExtensionSetting('maxTokens', parseInt(this.value))">
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:8px; background:var(--gray-50); border:none; padding:12px;">
+            <div style="font-size:12px; font-weight:600; color:var(--gray-700); margin-bottom:4px;">Extension Status</div>
+            <div id="ext-status-info" style="font-size:11px; color:var(--gray-500);">Last synced: Never</div>
+            <button onclick="syncExtensionNow()" class="pbtn" style="margin-top:8px; width:100%; border:1px solid var(--gray-200);">Sync Settings Now</button>
+          </div>
+        </div>
+
+        <!-- Save Settings -->
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px;">
+          <button
+            onclick="saveCustomSettings()"
+            style="
+              width: 100%;
+              padding: 12px;
+              background: #000;
+              color: #fff;
+              border: none;
+              border-radius: 6px;
+              cursor: pointer;
+              font-weight: 600;
+            "
+          >
+            Save Settings
+          </button>
+          
+          <button
+            onclick="testNotification()"
+            style="
+              width: 100%;
+              padding: 12px;
+              background: var(--gray-100);
+              color: var(--gray-800);
+              border: 1px solid var(--gray-200);
+              border-radius: 6px;
+              cursor: pointer;
+              font-weight: 600;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              gap: 8px;
+            "
+          >
+            🔔 Test Notification
+          </button>
+
+          <button
+            onclick="resetCustomSettings()"
+            style="
+              width: 100%;
+              padding: 12px;
+              background: #fee;
+              color: #c33;
+              border: 1px solid #fcc;
+              border-radius: 6px;
+              cursor: pointer;
+              font-weight: 600;
+            "
+          >
+            Reset to Defaults
+          </button>
+        </div>
+        <div
+          id="settings-status"
+          style="font-size: 12px; color: var(--gray-600); text-align: center"
+        ></div>
+      </div>
+    </div>
+
+    <!-- Bottom nav -->
+    <div class="bottom-nav">
+      <button class="nav-btn active" id="nav-home" onclick="switchTab('home')">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">Home</span>
+      </button>
+      <button
+        class="nav-btn"
+        id="nav-labs"
+        onclick="
+          switchTab('labs');
+          initLabsTab();
+        "
+      >
+        <span class="nav-icon">🧪</span>
+        <span class="nav-label">Labs</span>
+        <div id="labs-badge" class="nav-badge" style="display:none;"></div>
+      </button>
+      <button
+        class="nav-btn"
+        id="nav-settings"
+        onclick="
+          switchTab('settings');
+          updateAPIKeyDisplay();
+          loadCustomSettings();
+        "
+      >
+        <span class="nav-icon">⚙️</span>
+        <span class="nav-label">Settings</span>
+      </button>
+    </div>
+
+    <!-- Confirm Modal -->
+    <div class="modal-overlay" id="confirm-modal">
+      <div class="modal">
+        <div class="modal-icon">⏰</div>
+        <div class="modal-title">Time to Post!</div>
+        <div class="modal-text" id="confirm-modal-text">Your scheduled post is ready.</div>
+        <div class="modal-btns">
+          <button class="mbtn mbtn-no" onclick="closeConfirmModal(false)">Not now</button>
+          <button class="mbtn mbtn-yes" id="confirm-modal-yes">📤 Post Now</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script src="/app.js"></script>
+    <script>
+      function updateModeBadge() {
+        const badge = document.getElementById("topbar-mode-badge");
+        badge.textContent =
+          STATE.mode === "auto" ? "Auto-schedule" : "Review mode";
+      }
+
+      function renderScheduleView() {
+        const el = document.getElementById("schedule-view");
+        if (!STATE.posts || !STATE.posts.length) {
+          el.innerHTML = `<div class="empty"><div class="empty-icon">📭</div><div>Generate posts first from Home</div></div>`;
+          return;
+        }
+        el.innerHTML = STATE.posts
+          .map((p, i) => {
+            const timeLabel = TIME_LABELS[TIMES.indexOf(p.time)] || p.time;
+            return `
+      <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--gray-100);">
+        <div style="min-width:52px;font-size:12px;font-weight:600;color:var(--gray-400);padding-top:2px">${timeLabel}</div>
+        <div>
+          <div style="font-size:13px;line-height:1.5;color:var(--gray-800)">${esc(p.post)}</div>
+          <span class="type-pill type-${p.type}" style="margin-top:5px;display:inline-block">${p.type}</span>
+        </div>
+      </div>
+    `;
+          })
+          .join("");
+      }
+
+      // Init mode badge
+      document.addEventListener("DOMContentLoaded", () => {
+        updateModeBadge();
+      });
+    </script>
+  </body>
+</html>

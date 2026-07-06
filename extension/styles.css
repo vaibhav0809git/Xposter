@@ -1,0 +1,246 @@
+/* Modern Glassmorphism UI for XPoster AI Copilot */
+
+:root {
+    --xposter-primary: #1d9bf0;
+    --xposter-glass: rgba(255, 255, 255, 0.7);
+    --xposter-glass-dark: rgba(0, 0, 0, 0.7);
+    --xposter-blur: blur(12px);
+    --xposter-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    --xposter-border: rgba(255, 255, 255, 0.2);
+}
+
+/* Floating AI Button */
+#xposter-ai-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--xposter-primary);
+    box-shadow: 0 4px 15px rgba(29, 155, 240, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    z-index: 9999;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s;
+    user-select: none;
+    font-size: 28px;
+}
+
+#xposter-ai-button:active {
+    cursor: grabbing;
+    transform: scale(0.9);
+}
+
+#xposter-ai-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(29, 155, 240, 0.6);
+}
+
+/* Floating Panel */
+#xposter-ai-panel {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    width: 360px;
+    max-height: 80vh;
+    border-radius: 20px;
+    background: var(--xposter-glass);
+    backdrop-filter: var(--xposter-blur);
+    -webkit-backdrop-filter: var(--xposter-blur);
+    border: 1px solid var(--xposter-border);
+    box-shadow: var(--xposter-shadow);
+    z-index: 9998;
+    display: none; /* Controlled by JS via class */
+    flex-direction: column;
+    overflow: hidden;
+    resize: both;
+    min-width: 300px;
+    min-height: 200px;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+    animation: xposter-fade-in 0.3s ease;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+#xposter-ai-panel.visible {
+    display: flex !important;
+}
+
+@keyframes xposter-fade-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Dark Mode support */
+@media (prefers-color-scheme: dark) {
+    #xposter-ai-panel {
+        background: var(--xposter-glass-dark);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+}
+
+.xposter-header {
+    padding: 16px;
+    background: rgba(29, 155, 240, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--xposter-border);
+    cursor: move;
+}
+
+.xposter-title {
+    font-weight: 700;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.xposter-close {
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+    font-size: 18px;
+}
+
+.xposter-close:hover {
+    opacity: 1;
+}
+
+.xposter-content {
+    padding: 16px;
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+.xposter-empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #888;
+}
+
+.xposter-selected-tweet {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    border-left: 4px solid var(--xposter-primary);
+}
+
+.xposter-author {
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.xposter-replies {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.xposter-reply-card {
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 12px;
+    padding: 14px;
+    border: 1px solid var(--xposter-border);
+    transition: transform 0.2s;
+}
+
+@media (prefers-color-scheme: dark) {
+    .xposter-reply-card {
+        background: rgba(255, 255, 255, 0.05);
+    }
+}
+
+.xposter-reply-card:hover {
+    transform: translateY(-2px);
+}
+
+.xposter-reply-style {
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: 800;
+    color: var(--xposter-primary);
+    margin-bottom: 8px;
+}
+
+.xposter-reply-text {
+    font-size: 14px;
+    line-height: 1.4;
+    margin-bottom: 12px;
+}
+
+.xposter-reply-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.xposter-btn {
+    flex: 1;
+    padding: 8px;
+    border-radius: 8px;
+    border: none;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    transition: background 0.2s;
+}
+
+.xposter-btn-primary {
+    background: var(--xposter-primary);
+    color: white;
+}
+
+.xposter-btn-secondary {
+    background: rgba(0, 0, 0, 0.05);
+    color: inherit;
+}
+
+@media (prefers-color-scheme: dark) {
+    .xposter-btn-secondary {
+        background: rgba(255, 255, 255, 0.1);
+    }
+}
+
+.xposter-footer {
+    padding: 12px 16px;
+    border-top: 1px solid var(--xposter-border);
+    display: flex;
+    gap: 8px;
+}
+
+.xposter-highlight {
+    box-shadow: 0 0 0 2px var(--xposter-primary) !important;
+    transition: box-shadow 0.3s;
+}
+
+/* Loading Animation */
+.xposter-loader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+.xposter-spinner {
+    width: 30px;
+    height: 30px;
+    border: 3px solid rgba(29, 155, 240, 0.1);
+    border-top-color: var(--xposter-primary);
+    border-radius: 50%;
+    animation: xposter-spin 1s linear infinite;
+    margin-bottom: 10px;
+}
+
+@keyframes xposter-spin {
+    to { transform: rotate(360deg); }
+}

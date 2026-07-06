@@ -1,0 +1,45 @@
+{
+  "manifest_version": 3,
+  "name": "XPoster AI Copilot",
+  "version": "1.0.0",
+  "description": "AI Copilot for X (Twitter) that integrates with XPoster.",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "clipboardWrite"
+  ],
+  "action": {
+    "default_title": "XPoster AI Copilot"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://x.com/*"],
+      "js": [
+        "shared/utils.js",
+        "shared/prompts.js",
+        "storage.js",
+        "groq-service.js",
+        "tweet-parser.js",
+        "reply-generator.js",
+        "floating-button.js",
+        "floating-panel.js",
+        "content.js"
+      ],
+      "css": ["styles.css"]
+    },
+    {
+      "matches": ["http://localhost:*/*", "http://127.0.0.1:*/*"],
+      "js": ["sync.js"],
+      "all_frames": true
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["shared/*", "styles.css"],
+      "matches": ["https://x.com/*"]
+    }
+  ]
+}
