@@ -915,7 +915,7 @@ async function generatePosts() {
   const btn = document.getElementById('gen-btn');
   const btnText = document.getElementById('gen-btn-text');
   if (btn) btn.disabled = true;
-  if (btnText) btnText.textContent = 'Generating with Groq…';
+  if (btnText) btnText.textContent = 'Generating Posts...';
 
   // Show skeletons
   const list = document.getElementById('posts-list');
