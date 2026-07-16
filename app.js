@@ -220,6 +220,7 @@ function saveAPIKey() {
   save();
   updateAPIKeyDisplay();
   toast('✅ API key saved successfully');
+  syncExtensionNow(true);
 }
 
 function removeAPIKey() {
@@ -229,6 +230,7 @@ function removeAPIKey() {
     save();
     updateAPIKeyDisplay();
     toast('🗑️ API key removed');
+    syncExtensionNow(true);
   }
 }
 
@@ -1429,14 +1431,16 @@ function updateGlobalModel(val) {
   STATE.model = val;
   save();
   toast(`🤖 Model set to ${val}`);
+  syncExtensionNow(true);
 }
 
 function updateExtensionSetting(key, val) {
   STATE.extensionSettings[key] = val;
   save();
+  syncExtensionNow(true);
 }
 
-function syncExtensionNow() {
+function syncExtensionNow(silent = false) {
   const syncData = {
     type: 'XPOSTER_SYNC',
     settings: STATE.extensionSettings,
@@ -1453,7 +1457,9 @@ function syncExtensionNow() {
   
   const statusEl = document.getElementById('ext-status-info');
   if (statusEl) statusEl.textContent = `Last synced: ${new Date().toLocaleTimeString()}`;
-  toast('🔄 Sync signal sent to extension');
+  if (!silent) {
+    toast('🔄 Sync signal sent to extension');
+  }
 }
 
 function handleExtensionMessages() {
@@ -1634,8 +1640,10 @@ function resetCustomSettings() {
 function switchTab(tab) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
   document.getElementById(`panel-${tab}`).classList.add('active');
   document.getElementById(`nav-${tab}`).classList.add('active');
+  document.getElementById(`nav-${tab}-side`)?.classList.add('active');
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────
@@ -1660,6 +1668,9 @@ function init() {
   renderStats();
   startAlarmClock();
   handleExtensionMessages();
+  
+  // Auto-sync config to extension on dashboard load
+  syncExtensionNow(true);
 
   // Meter Update Loop
   setInterval(updatePostMeter, 1000);

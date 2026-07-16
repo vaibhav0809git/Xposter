@@ -16,16 +16,46 @@
   </head>
   <body>
     <div class="app">
-      <!-- Top bar -->
-      <div class="topbar">
-        <div class="topbar-left">
+      <!-- Sidebar (Laptop/Desktop View) -->
+      <div class="sidebar">
+        <div class="brand">
+          <div class="brand-icon">𝕏</div>
           <div>
-            <div class="topbar-logo">𝕏 AutoPoster</div>
-            <div class="topbar-sub">Tech · Coding · AI/ML</div>
+            <div class="brand-name">XPoster</div>
+            <div class="brand-sub">Auto Poster SaaS</div>
           </div>
         </div>
-        <div class="topbar-badge" id="topbar-mode-badge">Review mode</div>
+        <div class="sidebar-nav">
+          <button class="nav-item active" id="nav-home-side" onclick="switchTab('home')">
+            <span class="nav-icon">🏠</span> Home
+          </button>
+          <button class="nav-item" id="nav-labs-side" onclick="switchTab('labs'); initLabsTab();">
+            <span class="nav-icon">🧪</span> Labs
+          </button>
+          <button class="nav-item" id="nav-settings-side" onclick="switchTab('settings'); updateAPIKeyDisplay(); loadCustomSettings();">
+            <span class="nav-icon">⚙️</span> Settings
+          </button>
+        </div>
+        <div class="sidebar-footer">
+          <div class="mode-indicator">
+            <div class="indicator-dot active" id="sidebar-indicator-dot"></div>
+            <span id="sidebar-mode-label">Review Mode</span>
+          </div>
+        </div>
       </div>
+
+      <!-- Main Content Area -->
+      <div class="content-area">
+        <!-- Top bar -->
+        <div class="topbar">
+          <div class="topbar-left">
+            <div>
+              <div class="topbar-logo">𝕏 AutoPoster</div>
+              <div class="topbar-sub">Tech · Coding · AI/ML</div>
+            </div>
+          </div>
+          <div class="topbar-badge" id="topbar-mode-badge">Review mode</div>
+        </div>
 
       <!-- ── Panel: Home / Generate ── -->
       <div class="panel active" id="panel-home">
@@ -426,8 +456,21 @@ Return an array of objects. Each object must have "type" (hook, thread, poll, li
     <script>
       function updateModeBadge() {
         const badge = document.getElementById("topbar-mode-badge");
-        badge.textContent =
-          STATE.mode === "auto" ? "Auto-schedule" : "Review mode";
+        if (badge) {
+          badge.textContent = STATE.mode === "auto" ? "Auto-schedule" : "Review mode";
+        }
+        
+        const sideLabel = document.getElementById("sidebar-mode-label");
+        const sideDot = document.getElementById("sidebar-indicator-dot");
+        if (sideLabel && sideDot) {
+          if (STATE.mode === "auto") {
+            sideLabel.textContent = "Auto-Schedule";
+            sideDot.className = "indicator-dot active";
+          } else {
+            sideLabel.textContent = "Review Mode";
+            sideDot.className = "indicator-dot";
+          }
+        }
       }
 
       function renderScheduleView() {

@@ -19,7 +19,8 @@ const floatingPanel = {
     this.config = {
       settings: await storage.get('xposter_settings'),
       apiKey: await storage.get('xposter_apikey'),
-      model: await storage.get('xposter_model')
+      model: await storage.get('xposter_model'),
+      dashboardUrl: await storage.get('xposter_dashboard_url')
     };
 
     // Add delegated click listener for internal actions
@@ -53,7 +54,7 @@ const floatingPanel = {
 
       // Open Dashboard button (error state)
       if (target.dataset.action === 'open-dashboard') {
-        window.open('http://localhost:8080');
+        window.open(this.config.dashboardUrl || 'http://localhost:3000');
       }
     });
   },
@@ -114,6 +115,7 @@ const floatingPanel = {
       this.config.settings = await storage.get('xposter_settings');
       this.config.apiKey = await storage.get('xposter_apikey');
       this.config.model = await storage.get('xposter_model');
+      this.config.dashboardUrl = await storage.get('xposter_dashboard_url');
 
       const replies = await groqService.generateReplies(tweetData, this.config);
       this.renderReplies(replies);
